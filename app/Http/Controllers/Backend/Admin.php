@@ -12,10 +12,8 @@ class Admin extends Controller
     //登入
     public function login(ServiceAdmin $serviceAdmin)
     {
-        $request = request()->all();
-
-        $account = $request['account'];
-        $password = $request['password'];
+        $account = request()->get('account', '');
+        $password = request()->get('password', '');
 
         $accountDatas = $serviceAdmin->getAccount($account);
 
