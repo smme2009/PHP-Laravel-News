@@ -10,11 +10,11 @@ Route::group(['prefix' => 'storage'], function () {
     Route::post('image', 'storage@uploadImage');
 });
 
-//商品管理
-Route::group(['prefix' => 'product'], function () {
-    Route::get('', 'product@getList');
-    Route::get('{productId}', 'product@get');
-    Route::post('', 'product@create');
-    Route::put('{productId}', 'product@update');
-    Route::delete('{productId}', 'product@delete');
+//新聞管理
+Route::group(['prefix' => 'news'], function () {
+    Route::get('', 'News@getList');
+    Route::get('{newsId}', 'News@get');
+    Route::post('', 'News@create');
+    Route::put('{newsId}', 'News@update');
+    Route::delete('{newsId}', 'News@delete');
 });
