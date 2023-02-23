@@ -4,7 +4,7 @@ namespace App\Service;
 
 use App\Repository\News as RepositoryNews;
 
-//新聞管理
+//新聞
 class News
 {
     public $repositoryNews;
@@ -15,17 +15,17 @@ class News
     }
 
     //取得新聞資料
-    public function get($newsId)
+    public function get($newsId, $admin = false)
     {
-        $newsDatas = $this->repositoryNews->read($newsId);
+        $newsDatas = $this->repositoryNews->read($newsId, $admin);
 
         return $newsDatas;
     }
 
     //取得新聞列表
-    public function getList($page, $title)
+    public function getList($page, $title, $admin = false)
     {
-        $newsList = $this->repositoryNews->readList($page, $title);
+        $newsList = $this->repositoryNews->readList($page, $title, $admin);
 
         return $newsList;
     }

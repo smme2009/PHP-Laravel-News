@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Storage;
 
 use App\Model\News as ModelNews;
 
-//新聞管理
+//新聞
 class News
 {
     //新增新聞
@@ -26,32 +26,42 @@ class News
     }
 
     //讀取單一新聞
-    public function read($newsId)
+    public function read($newsId, $admin)
     {
-        $model = ModelNews::with('image')
-            ->find($newsId);
+        $query = ModelNews::with('image');
+
+        if (!$admin) {
+            $query = $this->setCondition($query);
+        }
+
+        $model = $query->find($newsId);
 
         if (!$model) {
             return false;
         }
 
-        $datas = $this->setData($model);
+        $datas = $this->setData($model, $admin);
 
         return $datas;
     }
 
     //讀取新聞列表
-    public function readList($page, $title)
+    public function readList($page, $title, $admin)
     {
         $skip = $page - 1;
 
-        $modelList = ModelNews::with('image')
+        $query = ModelNews::with('image')
             ->when($title != null, function ($query) use ($title) {
                 $query->where('title', 'like', '%' . $title . '%');
             })
             ->skip($skip)
-            ->take(10)
-            ->get();
+            ->take(10);
+
+        if (!$admin) {
+            $query = $this->setCondition($query);
+        }
+
+        $modelList = $query->get();
 
         if ($modelList->isEmpty()) {
             return false;
@@ -59,7 +69,7 @@ class News
 
         $dataList = [];
         foreach ($modelList as $model) {
-            $dataList[] = $this->setData($model);
+            $dataList[] = $this->setData($model, $admin);
         }
 
         return $dataList;
@@ -109,19 +119,42 @@ class News
     }
 
     //設定新聞資料
-    private function setData($model)
+    private function setData($model, $admin)
     {
         $data = new \stdClass();
 
         $data->newId = $model->news_id;
         $data->title = $model->title;
         $data->content = $model->content;
-        $data->imageId = $model->image_id;
-        $data->showTime = date('Y-m-d H:i:s', $model->show_time);
-        $data->hideTime = date('Y-m-d H:i:s', $model->hide_time);
-        $data->status = $model->status;
         $data->imgUrl = Storage::url($model->image->path);
 
+        if (!$admin) {
+            $data->imageId = $model->image_id;
+            $data->showTime = date('Y-m-d H:i:s', $model->show_time);
+            $data->hideTime = date('Y-m-d H:i:s', $model->hide_time);
+            $data->status = $model->status;
+        }
+
         return $data;
+    }
+
+    //設定條件
+    private function setCondition($query)
+    {
+        $time = time();
+
+        $query->where(function ($query) use ($time) {
+            $query->where('show_time', '<=', $time)
+                ->orWhere('show_time', 0);
+        });
+
+        $query->where(function ($query) use ($time) {
+            $query->where('hide_time', '>=', $time)
+                ->orWhere('hide_time', 0);
+        });
+
+        $query->where('status', 1);
+
+        return $query;
     }
 }

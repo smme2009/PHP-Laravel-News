@@ -19,7 +19,7 @@ class News extends Controller
     //取得新聞
     public function get($newsId)
     {
-        $data = $this->serviceNews->get($newsId);
+        $data = $this->serviceNews->get($newsId, true);
 
         if (!$data) {
             $responseDatas =  [
@@ -47,7 +47,7 @@ class News extends Controller
         $page = request()->get('page', 1);
         $title = request()->get('title', '');
 
-        $datas = $this->serviceNews->getList($page, $title);
+        $datas = $this->serviceNews->getList($page, $title, true);
 
         if (!$datas && $datas !== []) {
             $responseDatas =  [
